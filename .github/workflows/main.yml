@@ -1,0 +1,40 @@
+name: Upstream Sync
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 每天自动运行一次
+  workflow_dispatch: # 允许手动点击按钮触发
+
+jobs:
+  sync_latest_from_upstream:
+    name: Sync latest commits from upstream repo
+    runs-on: ubuntu-latest
+    if: ${{ github.event.repository.fork }}
+
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+
+      - name: Sync upstream changes
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+        with:
+          # 👇👇👇【这里必须修改】👇👇👇
+          # 请查看你仓库页面左上角 "forked from" 后面的名字
+          # 格式为：原作者用户名/仓库名
+          # 如果你 Fork 的是官方 Python 框架，可能是 widgetti/solara
+          # 如果是其他的（比如 Roblox 相关），请填那个原作者的 ID
+          upstream_sync_repo: 原作者用户名/Solara
+
+          # 👇【注意检查分支名】👇
+          # 大部分新项目是 main，老项目可能是 master
+          # 请去原仓库看一眼默认分支是哪个
+          upstream_sync_branch: main
+          
+          # 你的本地分支名
+          target_sync_branch: main
+          
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }} 
+          test_mode: true
